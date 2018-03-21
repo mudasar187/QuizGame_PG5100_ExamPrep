@@ -26,6 +26,8 @@
     </content>
     <orderEntry type="jdk" jdkName="1.8" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="backend" />
+    <orderEntry type="library" name="Maven: org.flywaydb:flyway-core:3.2.1" level="project" />
     <orderEntry type="library" name="Maven: org.joinfaces:jsf-spring-boot-starter:2.4.1" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter:1.5.4.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot:1.5.4.RELEASE" level="project" />
@@ -161,7 +163,5 @@
     <orderEntry type="library" scope="TEST" name="Maven: org.rnorth.visible-assertions:visible-assertions:2.1.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: net.java.dev.jna:jna:4.2.2" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.testcontainers:selenium:1.6.0" level="project" />
-    <orderEntry type="module" module-name="backend" />
-    <orderEntry type="library" name="Maven: org.flywaydb:flyway-core:3.2.1" level="project" />
   </component>
 </module>

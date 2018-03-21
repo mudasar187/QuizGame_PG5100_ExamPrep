@@ -16,6 +16,12 @@
     <dependencies>
 
         <dependency>
+            <groupId>com.quizgame</groupId>
+            <artifactId>backend</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.joinfaces</groupId>
             <artifactId>jsf-spring-boot-starter</artifactId>
         </dependency>
@@ -84,31 +90,6 @@
             <artifactId>selenium-support</artifactId>
             <version>${version.selenium}</version>
             <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <!-- To use Docker from tests -->
-            <groupId>org.testcontainers</groupId>
-            <artifactId>testcontainers</artifactId>
-            <version>${version.testcontainers}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.testcontainers</groupId>
-            <artifactId>selenium</artifactId>
-            <version>${version.testcontainers}</version>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.seleniumhq.selenium</groupId>
-                    <artifactId>selenium-remote-driver</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.quizgame</groupId>
-            <artifactId>backend</artifactId>
-            <version>1.0-SNAPSHOT</version>
         </dependency>
 
     </dependencies>
