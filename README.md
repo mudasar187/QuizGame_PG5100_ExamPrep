@@ -15,6 +15,7 @@ they do not yet have registered.
 
 The game hold track of how many times a player have won or lost a game. It is doing this by using sessions.
 
-In the end this is going to be hosted on a server online like Heroku.
-
 Also testing with Travis CI
+
+Also deployed to [Heroku](https://www.heroku.com/) , click on this url [https://quizgamespring.herokuapp.com/](https://quizgamespring.herokuapp.com/)
+
