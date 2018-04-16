@@ -1,6 +1,7 @@
 package com.quizgame.spring.service;
 
 import com.quizgame.spring.entity.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,7 +14,7 @@ import javax.persistence.Query;
 @Transactional
 public class ResetService {
 
-    @PersistenceContext
+    @Autowired
     private EntityManager em;
 
     public void resetDatabase(){
