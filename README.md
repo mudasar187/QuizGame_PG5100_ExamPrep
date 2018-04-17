@@ -8,12 +8,13 @@
 
 ## QuizGame - Springboot Project
 
-Using Spring and SpringBoot
+Using Spring and SpringBoot with hibernate
 
 This Quiz Game make use of Spring Security and enable players to log in or sign up if
 they do not yet have registered.
 
 The game hold track of how many times a player have won or lost a game. It is doing this by using sessions.
 
-Deployed to [Heroku](https://www.heroku.com/) , click on this url [https://quizgamespring.herokuapp.com/](https://quizgamespring.herokuapp.com/) to check out the application
+Deployed to Heroku <br>
+Play QuizGame [here !!](https://playquizgame.herokuapp.com/)
 
