@@ -21,7 +21,8 @@ public class DefaultDataInitializerService {
     @PostConstruct
     public void initialize(){
 
-        attempt(() -> userService.createUser("foo", "123"));
+        attempt(() -> userService.createUser("foo", "123", false));
+        attempt(() -> userService.createUser("bar", "123", true));
 
         Long ctgSE = attempt(() -> categoryService.createCategory("Software Engineering"));
         Long ctgH = attempt(() -> categoryService.createCategory("History"));

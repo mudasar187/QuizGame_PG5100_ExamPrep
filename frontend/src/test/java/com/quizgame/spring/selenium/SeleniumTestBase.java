@@ -1,6 +1,7 @@
 package com.quizgame.spring.selenium;
 
 import com.quizgame.spring.selenium.po.IndexPO;
+import com.quizgame.spring.selenium.po.LoginPO;
 import com.quizgame.spring.selenium.po.SignUpPO;
 import com.quizgame.spring.selenium.po.ui.MatchPO;
 import com.quizgame.spring.selenium.po.ui.ResultPO;
@@ -25,39 +26,18 @@ public abstract class SeleniumTestBase {
 
     protected abstract int getServerPort();
 
-
-    @Autowired
-    private QuizService quizService;
-
     private static final AtomicInteger counter = new AtomicInteger(0);
 
-    private String getUniqueId(){
-        return "foo_SeleniumLocalIT_" + counter.getAndIncrement();
+    private String getUniqueId() {
+        return "fooSeleniumLocalIT" + counter.getAndIncrement();
     }
-
 
     private IndexPO home;
 
 
-    private IndexPO createNewUser(String username, String password){
-
-        home.toStartingPage();
-
-        SignUpPO signUpPO = home.toSignUp();
-
-        IndexPO indexPO = signUpPO.createUser(username, password);
-        assertNotNull(indexPO);
-
-        return indexPO;
-    }
-
     @Before
     public void initTest() {
 
-        /*
-            we want to have a new session, otherwise the tests
-            will share the same Session beans
-         */
         getDriver().manage().deleteAllCookies();
 
         home = new IndexPO(getDriver(), getServerHost(), getServerPort());
@@ -68,13 +48,20 @@ public abstract class SeleniumTestBase {
     }
 
     @Test
-    public void testCreateAndLogoutUser(){
+    public void testCreateAndLogoutUser() {
 
         assertFalse(home.isLoggedIn());
 
         String username = getUniqueId();
         String password = "123456789";
-        home = createNewUser(username, password);
+        String retypePassword = "123456789";
+
+        home.toStartingPage();
+
+        SignUpPO signUpPO = home.toSignUp();
+
+        IndexPO indexPO = signUpPO.createUser(username, password, retypePassword);
+        assertNotNull(indexPO);
 
         assertTrue(home.isLoggedIn());
         assertTrue(home.getDriver().getPageSource().contains(username));
@@ -86,80 +73,111 @@ public abstract class SeleniumTestBase {
     }
 
     @Test
-    public void testNewMatch() {
+    public void testCreateUserWithInvalidUsername() {
 
-        createNewUser(getUniqueId(), "123");
+        String username = "username__";
+        String password = "123456789";
+        String retypePassword = "123456789";
 
-        MatchPO po = home.startNewMatch();
-        assertTrue(po.canSelectCategory());
+        SignUpPO signUpPO = home.toSignUp();
+
+        IndexPO indexPO = signUpPO.createUser(username, password, retypePassword);
+
+        assertNull(indexPO);
+        assertTrue(signUpPO.isOnPage());
+        assertFalse(home.isLoggedIn());
+
     }
 
     @Test
-    public void testFirstQuiz() {
+    public void testCreateUserWithNonMatchPassword() {
 
-        createNewUser(getUniqueId(), "123");
+        String username = "username";
+        String password = "123456789";
+        String retypePassword = "1234";
 
-        MatchPO po = home.startNewMatch();
-        String ctgId = po.getCategoryIds().get(0);
+        SignUpPO signUpPO = home.toSignUp();
 
-        assertTrue(po.canSelectCategory());
-        assertFalse(po.isQuestionDisplayed());
-
-        po.chooseCategory(ctgId);
-        assertFalse(po.canSelectCategory());
-        assertTrue(po.isQuestionDisplayed());
-
-        assertEquals(1, po.getQuestionCounter());
+        IndexPO indexPO = signUpPO.createUser(username, password, retypePassword);
+        assertNull(indexPO);
+        assertTrue(signUpPO.isOnPage());
+        assertFalse(home.isLoggedIn());
     }
 
     @Test
-    public void testWrongAnswer() {
+    public void testLoginWithNonExistingUser() {
 
-        createNewUser(getUniqueId(), "123");
+        assertFalse(home.isLoggedIn());
 
-        MatchPO matchPO = home.startNewMatch();
-        String ctgId = matchPO.getCategoryIds().get(0);
+        String username = "usernameOne";
+        String password = "1234";
 
-        matchPO.chooseCategory(ctgId);
+        LoginPO loginPO = home.toLogin();
+        assertTrue(loginPO.isOnPage());
 
-        long quizId = matchPO.getQuizId();
-
-        int rightAnswer = quizService.getQuiz(quizId).getIndexOfCorrectAnswer();
-        int wrongAnswer = (rightAnswer + 1) % 4;
-
-        ResultPO resultPO = matchPO.answerQuestion(wrongAnswer);
-        assertNotNull(resultPO);
-
-        assertTrue(resultPO.haveLost());
-        assertFalse(resultPO.haveWon());
+        IndexPO indexPO = loginPO.enterCredentials(username, password);
+        assertNull(indexPO);
+        assertTrue(loginPO.isOnPage());
+        assertFalse(home.isLoggedIn());
     }
 
     @Test
-    public void testWinAMatch() {
+    public void testCreateAndThenLoginWithWrongPassword() {
 
-        createNewUser(getUniqueId(), "123");
+        assertFalse(home.isLoggedIn());
 
-        MatchPO matchPO = home.startNewMatch();
-        String ctgId = matchPO.getCategoryIds().get(0);
-        matchPO.chooseCategory(ctgId);
+        String username = "usernameTwo";
+        String password = "123456789";
+        String retypePassword = "123456789";
+        String wrongPassWord = "123";
 
-        ResultPO resultPO = null;
+        SignUpPO signUpPO = home.toSignUp();
 
-        for (int i = 1; i <= 5; i++) {
-            assertTrue(matchPO.isQuestionDisplayed());
-            assertEquals(i, matchPO.getQuestionCounter());
+        IndexPO indexPO = signUpPO.createUser(username, password, retypePassword);
+        assertTrue(home.getDriver().getPageSource().contains(username));
+        assertNotNull(indexPO);
+        assertTrue(home.isOnPage());
 
-            long quizId = matchPO.getQuizId();
-            int rightAnswer = quizService.getQuiz(quizId).getIndexOfCorrectAnswer();
+        indexPO.doLogout();
 
-            resultPO = matchPO.answerQuestion(rightAnswer);
+        assertTrue(home.isOnPage());
 
-            if(i != 5) {
-                assertNull(resultPO);
-            }
-        }
+        LoginPO loginPO = home.toLogin();
+        assertTrue(loginPO.isOnPage());
 
-        assertTrue(resultPO.haveWon());
-        assertFalse(resultPO.haveLost());
+        loginPO.enterCredentials(username, wrongPassWord);
+
+        assertNotNull(loginPO);
+        assertFalse(home.isLoggedIn());
+
+    }
+
+    @Test
+    public void testCreateTwoUsersWithSameUsername() {
+
+        assertFalse(home.isLoggedIn());
+
+        String username = "usernameThree";
+        String password = "123456789";
+        String retypePassword = "123456789";
+
+        home.toStartingPage();
+
+        SignUpPO signUpPO = home.toSignUp();
+
+        IndexPO indexPO = signUpPO.createUser(username, password, retypePassword);
+        assertNotNull(indexPO);
+
+        assertTrue(home.isLoggedIn());
+        assertTrue(home.getDriver().getPageSource().contains(username));
+
+        home.doLogout();
+
+        home.toSignUp();
+
+        IndexPO indexPO1 = signUpPO.createUser(username, password, retypePassword);
+        assertTrue(signUpPO.isOnPage());
+        assertNull(indexPO1);
+        assertFalse(home.isLoggedIn());
     }
 }

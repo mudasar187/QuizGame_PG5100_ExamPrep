@@ -26,7 +26,7 @@ public class MatchStatsServiceTest extends ServiceTestBase{
 
         String username = "foo";
 
-        userService.createUser(username, "123");
+        userService.createUser(username, "123", false);
 
         MatchStats stats = matchStatsService.getMatchStats(username);
 
@@ -39,7 +39,7 @@ public class MatchStatsServiceTest extends ServiceTestBase{
 
         String username = "foo";
 
-        userService.createUser(username, "123");
+        userService.createUser(username, "123", false);
         matchStatsService.reportVictory(username);
         matchStatsService.reportVictory(username);
         matchStatsService.reportDefeat(username);

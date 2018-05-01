@@ -10,6 +10,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Named;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Named
 @RequestScoped
@@ -26,35 +28,46 @@ public class SignUpController {
 
 
     private String username;
-
     private String password;
+    private String retypePassword;
+    private boolean isAdmin;
 
-    public String signUpUser(){
+    public String signUpUser() {
+
+        Pattern special = Pattern.compile("[!@#$%&*()_+=|<>?{}\\[\\]~-]");
+        Matcher hasSpecial = special.matcher(username);
 
         boolean registered = false;
-        try {
-            registered = userService.createUser(username, password);
-        }catch (Exception e){
-            //nothing to do
-        }
 
-        if(registered){
-
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-            UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
-                    userDetails,
-                    password,
-                    userDetails.getAuthorities());
-
-            authenticationManager.authenticate(token);
-
-            if (token.isAuthenticated()) {
-                SecurityContextHolder.getContext().setAuthentication(token);
+        if (!retypePassword.equals(password)) {
+            return "/signup.jsf?faces-redirect=true&mismatchpassworderror=true";
+        } else if (hasSpecial.find()) {
+            return "/signup.jsf?faces-redirect=true&usernameinvaliderror=true";
+        } else {
+            try {
+                registered = userService.createUser(username, password, isAdmin);
+            } catch (Exception e) {
+                //nothing to do
             }
 
-            return "/index.jsf?faces-redirect=true";
-        } else {
-            return "/signup.jsf?faces-redirect=true&error=true";
+            if (registered) {
+
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
+                        userDetails,
+                        password,
+                        userDetails.getAuthorities());
+
+                authenticationManager.authenticate(token);
+
+                if (token.isAuthenticated()) {
+                    SecurityContextHolder.getContext().setAuthentication(token);
+                }
+
+                return "/index.jsf?faces-redirect=true";
+            } else {
+                return "/signup.jsf?faces-redirect=true&error=true";
+            }
         }
     }
 
@@ -72,5 +85,21 @@ public class SignUpController {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getRetypePassword() {
+        return retypePassword;
+    }
+
+    public void setRetypePassword(String retypePassword) {
+        this.retypePassword = retypePassword;
+    }
+
+    public boolean isAdmin() {
+        return isAdmin;
+    }
+
+    public void setAdmin(boolean admin) {
+        isAdmin = admin;
     }
 }

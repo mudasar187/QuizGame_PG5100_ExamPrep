@@ -8,9 +8,16 @@ public class ServiceTestBase {
     @Autowired
     private ResetService deleteService;
 
+    @Autowired
+    private UserService userService;
+
 
     @Before
     public void cleanDatabase(){
         deleteService.resetDatabase();
+    }
+
+    protected boolean createUser(String user, String password){
+        return userService.createUser(user,password,false);
     }
 }
